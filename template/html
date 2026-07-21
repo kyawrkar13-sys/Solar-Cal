@@ -1,139 +1,144 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Solar Panel Calculator</title>
+<title>Sigen C&I Solar Calculator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 body{
-    font-family:Arial,sans-serif;
-    background:#f2f2f2;
-    padding:20px;
+font-family:Arial;
+background:#f2f2f2;
+padding:20px;
 }
-.container{
-    max-width:500px;
-    margin:auto;
-    background:white;
-    padding:20px;
-    border-radius:10px;
-    box-shadow:0 0 10px rgba(0,0,0,.2);
+.box{
+max-width:500px;
+margin:auto;
+background:white;
+padding:20px;
+border-radius:12px;
 }
-h2{
-    text-align:center;
-}
-input,select{
-    width:100%;
-    padding:10px;
-    margin-top:8px;
-    margin-bottom:15px;
+input,select,button{
+width:100%;
+padding:10px;
+margin:8px 0;
 }
 button{
-    width:100%;
-    padding:12px;
-    background:#28a745;
-    color:white;
-    border:none;
-    cursor:pointer;
-    font-size:16px;
+background:#198754;
+color:white;
+border:0;
+font-size:16px;
 }
 .result{
-    margin-top:20px;
-    background:#eef;
-    padding:15px;
-    border-radius:8px;
+background:#eef5ff;
+padding:15px;
+margin-top:15px;
+border-radius:8px;
+}
+.diagram{
+font-family:monospace;
+background:#222;
+color:white;
+padding:15px;
+margin-top:15px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="box">
 
-<h2>Solar Panel Calculator</h2>
+<h2>Sigen C&I Solar Calculator</h2>
 
-<label>Roof Length (m)</label>
-<input type="number" id="length">
+<label>PV Capacity (kWp)</label>
+<input id="pv" value="110">
 
-<label>Roof Width (m)</label>
-<input type="number" id="width">
+<label>Inverter Capacity (kW)</label>
+<input id="inv" value="30">
 
-<label>Panel Type</label>
+<label>Panel Watt</label>
 <select id="panel">
 <option value="550">550W</option>
-<option value="600">600W</option>
+<option value="600" selected>600W</option>
 <option value="700">700W</option>
 </select>
 
-<label>Orientation</label>
-<select id="orientation">
-<option value="portrait">Portrait</option>
-<option value="landscape">Landscape</option>
+<label>System Type</label>
+<select id="type">
+<option>On Grid</option>
+<option>Hybrid</option>
 </select>
 
-<button onclick="calculate()">Calculate</button>
+<button onclick="calc()">Calculate</button>
+
 
 <div class="result" id="result"></div>
 
+<div class="diagram" id="diagram"></div>
+
+
 </div>
+
 
 <script>
 
-function calculate(){
+function calc(){
 
-let L=parseFloat(document.getElementById("length").value);
-let W=parseFloat(document.getElementById("width").value);
+let pv=Number(document.getElementById("pv").value);
+let inv=Number(document.getElementById("inv").value);
+let watt=Number(document.getElementById("panel").value);
+let type=document.getElementById("type").value;
 
-let watt=parseInt(document.getElementById("panel").value);
 
-let orientation=document.getElementById("orientation").value;
+let qty=Math.ceil((pv*1000)/watt);
+let ratio=(pv/inv).toFixed(2);
 
-let panelL=2.279;
-let panelW=1.134;
-
-if(watt==600){
-panelL=2.465;
-panelW=1.134;
-}
-
-if(watt==700){
-panelL=2.384;
-panelW=1.303;
-}
-
-if(orientation=="landscape"){
-let t=panelL;
-panelL=panelW;
-panelW=t;
-}
-
-let perRow=Math.floor(L/panelL);
-let rows=Math.floor(W/panelW);
-
-let total=perRow*rows;
-
-let kw=(total*watt/1000).toFixed(2);
-
-let area=(L*W).toFixed(2);
 
 document.getElementById("result").innerHTML=
 `
-<h3>Result</h3>
-
-Roof Area : ${area} m²<br><br>
-
-Panels / Row : ${perRow}<br>
-
-Rows : ${rows}<br>
-
-<b>Total Panels : ${total}</b><br><br>
-
-<b>Total DC Capacity : ${kw} kW</b>
-
+<b>System Summary</b><br><br>
+PV Size : ${pv} kWp<br>
+Inverter : ${inv} kW<br>
+Panel Qty : ${qty} pcs<br>
+DC/AC Ratio : ${ratio}<br>
+System : ${type}
 `;
+
+
+if(type=="On Grid"){
+document.getElementById("diagram").innerHTML=
+`
+PV ARRAY<br>
+&nbsp;&nbsp;│<br>
+DC ISOLATOR<br>
+&nbsp;&nbsp;│<br>
+SIGEN ${inv}kW INV<br>
+&nbsp;&nbsp;│<br>
+AC MCCB<br>
+&nbsp;&nbsp;│<br>
+MAIN DB<br>
+&nbsp;&nbsp;│<br>
+GRID
+`;
+}
+else{
+document.getElementById("diagram").innerHTML=
+`
+PV ARRAY<br>
+&nbsp;&nbsp;│<br>
+SIGEN HYBRID INV<br>
+&nbsp;&nbsp;│<br>
+BATTERY<br>
+&nbsp;&nbsp;│<br>
+LOAD DB<br>
+&nbsp;&nbsp;│<br>
+GRID
+`;
+}
 
 }
 
 </script>
 
 </body>
+</html>
