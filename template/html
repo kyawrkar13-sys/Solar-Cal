@@ -1,144 +1,328 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Sigen C&I Solar Calculator</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Solar Calculator</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+
 body{
-font-family:Arial;
-background:#f2f2f2;
-padding:20px;
+    margin:0;
+    background:#e5e5e5;
+    font-family:Arial, sans-serif;
 }
-.box{
-max-width:500px;
-margin:auto;
-background:white;
-padding:20px;
-border-radius:12px;
+
+
+/* Mobile App Frame */
+
+.app{
+    width:390px;
+    max-width:100%;
+    min-height:100vh;
+    margin:auto;
+    background:white;
+    border-radius:25px;
+    overflow:hidden;
+    box-shadow:0 5px 25px rgba(0,0,0,0.25);
 }
-input,select,button{
-width:100%;
-padding:10px;
-margin:8px 0;
+
+
+/* Header */
+
+.header{
+    background:#ff9800;
+    color:white;
+    text-align:center;
+    padding:25px;
 }
+
+
+.logo img{
+    width:80px;
+    height:80px;
+    border-radius:20px;
+}
+
+
+.logo{
+    font-size:60px;
+}
+
+
+.title{
+    font-size:24px;
+    font-weight:bold;
+    margin-top:10px;
+}
+
+
+.sub{
+    font-size:14px;
+}
+
+
+/* Body */
+
+.content{
+    padding:20px;
+}
+
+
+label{
+    font-weight:bold;
+    display:block;
+    margin-top:15px;
+}
+
+
+input, select{
+
+    width:100%;
+    padding:12px;
+    margin-top:7px;
+
+    border:1px solid #ccc;
+    border-radius:12px;
+
+    font-size:16px;
+
+}
+
+
 button{
-background:#198754;
-color:white;
-border:0;
-font-size:16px;
+
+    width:100%;
+
+    margin-top:25px;
+
+    padding:14px;
+
+    background:#ff9800;
+
+    color:white;
+
+    border:none;
+
+    border-radius:15px;
+
+    font-size:18px;
+
+    font-weight:bold;
+
 }
+
+
 .result{
-background:#eef5ff;
-padding:15px;
-margin-top:15px;
-border-radius:8px;
+
+    margin-top:20px;
+
+    padding:15px;
+
+    background:#eef8ff;
+
+    border-radius:15px;
+
+    line-height:1.8;
+
 }
-.diagram{
-font-family:monospace;
-background:#222;
-color:white;
-padding:15px;
-margin-top:15px;
-}
+
+
 </style>
+
 </head>
+
 
 <body>
 
-<div class="box">
 
-<h2>Sigen C&I Solar Calculator</h2>
-
-<label>PV Capacity (kWp)</label>
-<input id="pv" value="110">
-
-<label>Inverter Capacity (kW)</label>
-<input id="inv" value="30">
-
-<label>Panel Watt</label>
-<select id="panel">
-<option value="550">550W</option>
-<option value="600" selected>600W</option>
-<option value="700">700W</option>
-</select>
-
-<label>System Type</label>
-<select id="type">
-<option>On Grid</option>
-<option>Hybrid</option>
-</select>
-
-<button onclick="calc()">Calculate</button>
+<div class="app">
 
 
-<div class="result" id="result"></div>
+<div class="header">
 
-<div class="diagram" id="diagram"></div>
+
+<!-- Logo နေရာ -->
+
+<div class="logo">
+
+<img src="logo.png" 
+onerror="this.style.display='none';">
+
+☀️
+
+</div>
+
+
+<div class="title">
+Amber Light Solar
+</div>
+
+
+<div class="sub">
+PV Design Tool
+</div>
 
 
 </div>
 
 
+
+
+<div class="content">
+
+
+<label>
+Roof Length (m)
+</label>
+
+<input id="length" type="number" placeholder="Example 20">
+
+
+
+<label>
+Roof Width (m)
+</label>
+
+<input id="width" type="number" placeholder="Example 10">
+
+
+
+<label>
+Panel Watt
+</label>
+
+<select id="watt">
+
+<option value="615">615 W</option>
+<option value="650">650 W</option>
+<option value="700">700 W</option>
+<option value="720">720 W</option>
+<option value="750">750 W</option>
+
+</select>
+
+
+
+
+<label>
+Roof Utilization (%)
+</label>
+
+<input id="util" type="number" value="80">
+
+
+
+<button onclick="calculate()">
+Calculate
+</button>
+
+
+
+<div class="result" id="result">
+
+Result will appear here
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
 <script>
 
-function calc(){
 
-let pv=Number(document.getElementById("pv").value);
-let inv=Number(document.getElementById("inv").value);
-let watt=Number(document.getElementById("panel").value);
-let type=document.getElementById("type").value;
+function calculate(){
 
 
-let qty=Math.ceil((pv*1000)/watt);
-let ratio=(pv/inv).toFixed(2);
+let length =
+Number(document.getElementById("length").value);
 
 
-document.getElementById("result").innerHTML=
-`
-<b>System Summary</b><br><br>
-PV Size : ${pv} kWp<br>
-Inverter : ${inv} kW<br>
-Panel Qty : ${qty} pcs<br>
-DC/AC Ratio : ${ratio}<br>
-System : ${type}
-`;
+let width =
+Number(document.getElementById("width").value);
 
 
-if(type=="On Grid"){
-document.getElementById("diagram").innerHTML=
-`
-PV ARRAY<br>
-&nbsp;&nbsp;│<br>
-DC ISOLATOR<br>
-&nbsp;&nbsp;│<br>
-SIGEN ${inv}kW INV<br>
-&nbsp;&nbsp;│<br>
-AC MCCB<br>
-&nbsp;&nbsp;│<br>
-MAIN DB<br>
-&nbsp;&nbsp;│<br>
-GRID
-`;
-}
-else{
-document.getElementById("diagram").innerHTML=
-`
-PV ARRAY<br>
-&nbsp;&nbsp;│<br>
-SIGEN HYBRID INV<br>
-&nbsp;&nbsp;│<br>
-BATTERY<br>
-&nbsp;&nbsp;│<br>
-LOAD DB<br>
-&nbsp;&nbsp;│<br>
-GRID
-`;
-}
+let watt =
+Number(document.getElementById("watt").value);
+
+
+let util =
+Number(document.getElementById("util").value);
+
+
+
+if(!length || !width){
+
+alert("Enter Roof Size");
+
+return;
 
 }
+
+
+// Roof
+
+let roofArea = length * width;
+
+
+// Usable
+
+let usable =
+roofArea * util /100;
+
+
+// Panel Area
+
+let panelArea =
+2.384 * 1.303;
+
+
+// Qty
+
+let qty =
+Math.floor(usable / panelArea);
+
+
+// DC kW
+
+let dc =
+qty * watt /1000;
+
+
+// Inverter
+
+let inverter =
+dc * 0.8;
+
+
+
+document.getElementById("result").innerHTML =
+
+`
+<b>Roof Area :</b> ${roofArea.toFixed(2)} m²<br>
+
+<b>Total Panel Qty :</b> ${qty} pcs<br>
+
+<b>Total DC :</b> ${dc.toFixed(2)} kW<br>
+
+<b>Recommended Inverter :</b> ${Math.ceil(inverter)} kW
+
+`;
+
+}
+
 
 </script>
+
 
 </body>
 </html>
