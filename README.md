@@ -1,2 +1,2 @@
 # Rkar-Kyaw
-Solar-Cal ;
+AmberLighr.Solar.Cal ;
